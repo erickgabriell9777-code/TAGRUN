@@ -115,6 +115,10 @@ export default function App() {
 
   const beginMatch = () => {
     if (!match) return;
+    if (!match.area) {
+      Alert.alert("Defina a área de jogo", "Use o GPS para marcar o centro e escolha um raio antes de iniciar a partida.");
+      return;
+    }
     setMatch(startMatch(match));
     setClock(Date.now());
     setScreen("game");
