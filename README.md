@@ -37,6 +37,34 @@ O TagRun deve continuar útil sem internet: mapa previamente baixado, GPS local,
 - [Especificação do produto](docs/PRODUCT_SPEC.md)
 - [Arquitetura e decisões técnicas](docs/TECHNICAL_ARCHITECTURE.md)
 
+## Aplicativo — protótipo 0.1.0
+
+A primeira base do aplicativo foi iniciada com Expo + React Native + TypeScript.
+
+### O que já existe no protótipo
+- Tela inicial com identificação do jogador.
+- Fluxo local de configuração e sala de espera.
+- Configuração de duração e quantidade de pegadores.
+- Tela de partida com cronômetro funcional.
+- Solicitação de permissão e leitura da localização GPS do próprio aparelho.
+- Registro local do botão **FUI PEGO** e tela de resultado.
+
+### O que ainda NÃO está implementado
+- Salas reais entre vários celulares.
+- Comunicação entre aparelhos sem internet.
+- Mapa real, mapas offline e marcadores de outros jogadores.
+- Sorteio e distribuição real de papéis.
+- Sincronização de capturas, radar e resultados entre participantes.
+- Testes em aparelhos físicos e validação de compilação.
+
+### Como iniciar o protótipo
+Com Node.js instalado:
+```bash
+npm install
+npx expo start
+```
+Depois, abra o projeto no Expo Go para testar a interface e o fluxo local.
+
 ## Status
 
-Projeto em fase de definição técnica e preparação da base. As decisões ainda marcadas como **a definir** não devem ser tratadas como requisitos fechados.
+A base inicial do aplicativo está no repositório, mas ainda é um **protótipo local**, não uma versão multiplayer pronta. As decisões ainda marcadas como **a definir** não devem ser tratadas como requisitos fechados.
