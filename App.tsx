@@ -4,6 +4,7 @@ import * as Location from "expo-location";
 import { StatusBar } from "expo-status-bar";
 import { createMatch, finishMatch, getRemainingSeconds, hasLocalCapture, registerCapture, startMatch, type MatchSession } from "./src/domain/match";
 import { clearMatch, loadMatch, saveMatch } from "./src/storage/matchStorage";
+import { getLocationFreshness, formatLocationAge, type DeviceLocation } from "./src/domain/location";
 
 type Screen = "home" | "setup" | "lobby" | "game" | "results";
 const COLORS = { bg: "#07111F", panel: "#101F32", panel2: "#162A40", cyan: "#35D6E8", white: "#F4F8FC", muted: "#91A4B8", red: "#FF647C", green: "#53D69A" };
@@ -16,7 +17,8 @@ export default function App() {
   const [match, setMatch] = useState<MatchSession | null>(null);
   const [restoring, setRestoring] = useState(true);
   const [clock, setClock] = useState(Date.now());
-  const [locationText, setLocationText] = useState("Localização ainda não solicitada");
+  const [locationFix, setLocationFix] = useState<DeviceLocation | null>(null);
+  const [locationMessage, setLocationMessage] = useState("Localização ainda não solicitada");
   const [storageWarning, setStorageWarning] = useState("");
 
   useEffect(() => {
@@ -67,20 +69,28 @@ export default function App() {
   useEffect(() => {
     if (screen !== "game") return;
     let active = true;
+    let subscription: Location.LocationSubscription | null = null;
     (async () => {
       try {
         const permission = await Location.requestForegroundPermissionsAsync();
         if (!permission.granted) {
-          if (active) setLocationText("Permissão negada. Ative a localização nas configurações do celular.");
+          if (active) setLocationMessage("Permissão negada. Ative a localização nas configurações do celular.");
           return;
         }
-        const position = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced });
-        if (active) setLocationText(`GPS atualizado: ${position.coords.latitude.toFixed(5)}, ${position.coords.longitude.toFixed(5)} • precisão aproximada ${Math.round(position.coords.accuracy ?? 0)} m`);
+        subscription = await Location.watchPositionAsync(
+          { accuracy: Location.Accuracy.Balanced, timeInterval: 5000, distanceInterval: 5 },
+          (position) => {
+            if (!active) return;
+            setLocationFix({ latitude: position.coords.latitude, longitude: position.coords.longitude, accuracy: position.coords.accuracy, timestamp: position.timestamp });
+            setLocationMessage("");
+          }
+        );
+        if (!active) subscription.remove();
       } catch {
-        if (active) setLocationText("Não foi possível obter a localização neste momento.");
+        if (active) setLocationMessage("Não foi possível acompanhar o GPS. Verifique se a localização está ativada.");
       }
     })();
-    return () => { active = false; };
+    return () => { active = false; subscription?.remove(); };
   }, [screen]);
 
   const formatTime = (seconds: number) => `${String(Math.floor(seconds / 60)).padStart(2, "0")}:${String(seconds % 60).padStart(2, "0")}`;
@@ -117,7 +127,8 @@ export default function App() {
       await clearMatch();
       setMatch(null);
       setScreen("home");
-      setLocationText("Localização ainda não solicitada");
+      setLocationFix(null);
+      setLocationMessage("Localização ainda não solicitada");
     } catch {
       Alert.alert("Aviso", "Não foi possível limpar a partida salva neste aparelho.");
     }
@@ -185,7 +196,11 @@ export default function App() {
           <View style={styles.mapPlaceholder}>
             <Text style={styles.mapIcon}>⌖</Text>
             <Text style={styles.cardTitle}>LOCALIZAÇÃO DO APARELHO</Text>
-            <Text style={styles.muted}>{locationText}</Text>
+            {locationFix ? <>
+              <Text style={styles.muted}>{locationFix.latitude.toFixed(5)}, {locationFix.longitude.toFixed(5)}</Text>
+              <Text style={styles.muted}>Precisão aproximada: {Math.round(locationFix.accuracy ?? 0)} m</Text>
+              <Text style={[styles.note, getLocationFreshness(locationFix, clock) === "stale" && styles.warning]}>{getLocationFreshness(locationFix, clock) === "fresh" ? "GPS AO VIVO • atualizado " + formatLocationAge(clock - locationFix.timestamp) + " atrás" : "POSIÇÃO DESATUALIZADA • última leitura " + formatLocationAge(clock - locationFix.timestamp) + " atrás"}</Text>
+            </> : <Text style={styles.muted}>{locationMessage || "Aguardando primeira leitura do GPS..."}</Text>}
             <Text style={styles.note}>O mapa real e as posições dos outros participantes ainda não estão implementados. A localização mostrada é apenas deste aparelho.</Text>
           </View>
           <View style={styles.infoCard}><Text style={styles.cardTitle}>Eventos registrados</Text><Text style={styles.muted}>Captura local: {hasLocalCapture(match) ? "registrada" : "nenhuma"}</Text><Text style={styles.muted}>Total de eventos: {match.events.length}</Text></View>
