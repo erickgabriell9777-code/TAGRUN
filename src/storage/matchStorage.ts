@@ -39,6 +39,7 @@ function isMatchSession(value: unknown): value is MatchSession {
     typeof match.createdAt === "number" &&
     (match.startedAt === null || typeof match.startedAt === "number") &&
     (match.finishedAt === null || typeof match.finishedAt === "number") &&
+    (match.area === undefined || match.area === null || (typeof match.area === "object" && typeof match.area.radiusMeters === "number" && typeof match.area.center?.latitude === "number" && typeof match.area.center?.longitude === "number")) &&
     Array.isArray(match.events) &&
     match.events.every((event) => event && typeof event.id === "string" && event.type === "capture_registered" && typeof event.playerId === "string" && typeof event.createdAt === "number");
 }
