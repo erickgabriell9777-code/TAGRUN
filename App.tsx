@@ -5,6 +5,7 @@ import { StatusBar } from "expo-status-bar";
 import { createMatch, finishMatch, getRemainingSeconds, hasLocalCapture, registerCapture, startMatch, type MatchSession } from "./src/domain/match";
 import { clearMatch, loadMatch, saveMatch } from "./src/storage/matchStorage";
 import { getLocationFreshness, formatLocationAge, type DeviceLocation } from "./src/domain/location";
+import { isInsideMatchArea, validateMatchAreaRadius } from "./src/domain/area";
 
 type Screen = "home" | "setup" | "lobby" | "game" | "results";
 const COLORS = { bg: "#07111F", panel: "#101F32", panel2: "#162A40", cyan: "#35D6E8", white: "#F4F8FC", muted: "#91A4B8", red: "#FF647C", green: "#53D69A" };
@@ -19,6 +20,8 @@ export default function App() {
   const [clock, setClock] = useState(Date.now());
   const [locationFix, setLocationFix] = useState<DeviceLocation | null>(null);
   const [locationMessage, setLocationMessage] = useState("Localização ainda não solicitada");
+  const [areaRadius, setAreaRadius] = useState("300");
+  const [areaMessage, setAreaMessage] = useState("");
   const [storageWarning, setStorageWarning] = useState("");
 
   useEffect(() => {
@@ -184,6 +187,21 @@ export default function App() {
             <Text style={styles.muted}>Duração: {match.durationSeconds / 60} minutos</Text>
             <Text style={styles.code}>LOCAL • {match.id.slice(-6).toUpperCase()}</Text>
           </View>
+          <Text style={styles.label}>RAIO DA ÁREA DE JOGO (METROS)</Text>
+          <TextInput value={areaRadius} onChangeText={setAreaRadius} keyboardType="number-pad" style={styles.input} />
+          <Text style={styles.note}>Defina o centro usando o GPS deste aparelho. Escolha uma área segura, sem atravessar ruas movimentadas ou locais proibidos.</Text>
+          <Button label="DEFINIR CENTRO PELO MEU GPS" secondary onPress={async () => {
+            try {
+              const radius = validateMatchAreaRadius(Number(areaRadius));
+              const permission = await Location.requestForegroundPermissionsAsync();
+              if (!permission.granted) { setAreaMessage("Permissão de localização necessária para definir a área."); return; }
+              const position = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced });
+              setMatch({ ...match, area: { center: { latitude: position.coords.latitude, longitude: position.coords.longitude }, radiusMeters: radius } });
+              setAreaMessage("Centro e raio da área salvos nesta partida.");
+            } catch (error) { setAreaMessage(error instanceof Error ? error.message : "Não foi possível definir a área."); }
+          }} />
+          {!!match.area && <Text style={styles.muted}>Área definida: raio de {match.area.radiusMeters} m • centro {match.area.center.latitude.toFixed(5)}, {match.area.center.longitude.toFixed(5)}</Text>}
+          {!!areaMessage && <Text style={styles.note}>{areaMessage}</Text>}
           <Text style={styles.note}>Esta sala ainda é local. Participantes de outros celulares e convites multiplayer ainda não estão conectados.</Text>
           <Button label="INICIAR TESTE DE PARTIDA" onPress={beginMatch} />
           <Button label="VOLTAR AO INÍCIO" secondary onPress={returnHome} />
@@ -201,7 +219,8 @@ export default function App() {
               <Text style={styles.muted}>Precisão aproximada: {Math.round(locationFix.accuracy ?? 0)} m</Text>
               <Text style={[styles.note, getLocationFreshness(locationFix, clock) === "stale" && styles.warning]}>{getLocationFreshness(locationFix, clock) === "fresh" ? "GPS AO VIVO • atualizado " + formatLocationAge(clock - locationFix.timestamp) + " atrás" : "POSIÇÃO DESATUALIZADA • última leitura " + formatLocationAge(clock - locationFix.timestamp) + " atrás"}</Text>
             </> : <Text style={styles.muted}>{locationMessage || "Aguardando primeira leitura do GPS..."}</Text>}
-            <Text style={styles.note}>O mapa real e as posições dos outros participantes ainda não estão implementados. A localização mostrada é apenas deste aparelho.</Text>
+            {match.area && locationFix ? <Text style={[styles.note, isInsideMatchArea(locationFix, match.area) ? styles.muted : styles.warning]}>{isInsideMatchArea(locationFix, match.area) ? "DENTRO DA ÁREA DE JOGO" : "FORA DA ÁREA DE JOGO"} • raio de {match.area.radiusMeters} m</Text> : <Text style={styles.note}>Defina uma área antes da partida para acompanhar o limite local. O mapa visual e os outros participantes ainda não estão implementados.</Text>}
+            <Text style={styles.note}>A posição e o limite são verificados neste aparelho; não há sincronização multiplayer ainda.</Text>
           </View>
           <View style={styles.infoCard}><Text style={styles.cardTitle}>Eventos registrados</Text><Text style={styles.muted}>Captura local: {hasLocalCapture(match) ? "registrada" : "nenhuma"}</Text><Text style={styles.muted}>Total de eventos: {match.events.length}</Text></View>
           <Button label={hasLocalCapture(match) ? "CAPTURA JÁ REGISTRADA" : "FUI PEGO"} disabled={hasLocalCapture(match)} onPress={markCaptured} />
