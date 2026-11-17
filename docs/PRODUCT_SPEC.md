@@ -43,12 +43,11 @@ Diretrizes já escolhidas:
 - Radar global e sincronizado para todos os pegadores.
 - Mesmo intervalo, duração de visibilidade, alcance e horário de ativação para os pegadores.
 - Ativação automática, sem depender de cada pegador apertar um botão.
+- O motor de ciclos já calcula aviso, ativação, fim da visibilidade e próxima ativação a partir do mesmo horário de início da partida; todos os aparelhos precisam receber o mesmo horário e configuração.
+- Os valores de intervalo, duração, alcance e aviso usados nos testes são apenas parâmetros técnicos de teste, não configurações finais aprovadas.
 
 Ainda precisa ser decidido:
-- Intervalo entre ativações.
-- Duração da janela de visibilidade.
-- Alcance.
-- Aviso antecipado.
+- Definir os valores finais de intervalo entre ativações, duração da janela, alcance e aviso antecipado.
 - Se as posições são fotografadas no início ou atualizadas durante a janela.
 - Se fugitivos recebem alguma informação sobre a ativação.
 - Comportamento quando um aparelho perde comunicação ou GPS.
