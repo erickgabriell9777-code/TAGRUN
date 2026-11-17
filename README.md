@@ -44,10 +44,13 @@ A primeira base do aplicativo foi iniciada com Expo + React Native + TypeScript.
 ### O que já existe no protótipo
 - Tela inicial com identificação do jogador.
 - Fluxo local de configuração e sala de espera.
-- Configuração de duração e quantidade de pegadores.
-- Tela de partida com cronômetro funcional.
+- Configuração validada de duração (1–180 minutos) e quantidade de pegadores.
+- Tela de partida com cronômetro calculado por timestamps.
 - Solicitação de permissão e leitura da localização GPS do próprio aparelho.
-- Registro local do botão **FUI PEGO** e tela de resultado.
+- Persistência local da partida e dos eventos usando AsyncStorage.
+- Recuperação da partida após fechar e reabrir o aplicativo.
+- Registro de captura local idempotente (o mesmo jogador não é contado duas vezes).
+- Testes automatizados das regras de domínio e workflow de CI para typecheck/testes.
 
 ### O que ainda NÃO está implementado
 - Salas reais entre vários celulares.
@@ -67,4 +70,4 @@ Depois, abra o projeto no Expo Go para testar a interface e o fluxo local.
 
 ## Status
 
-A base inicial do aplicativo está no repositório, mas ainda é um **protótipo local**, não uma versão multiplayer pronta. As decisões ainda marcadas como **a definir** não devem ser tratadas como requisitos fechados.
+A base inicial do aplicativo está no repositório como **protótipo offline local**, não uma versão multiplayer pronta. A persistência foi implementada no código, mas ainda precisa ser validada em aparelho físico. As decisões ainda marcadas como **a definir** não devem ser tratadas como requisitos fechados.
