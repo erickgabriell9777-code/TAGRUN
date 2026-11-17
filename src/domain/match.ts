@@ -1,3 +1,5 @@
+import type { MatchArea } from "./area";
+
 export type MatchStatus = "waiting" | "running" | "finished";
 
 export type MatchEvent = {
@@ -18,6 +20,7 @@ export type MatchSession = {
   startedAt: number | null;
   finishedAt: number | null;
   events: MatchEvent[];
+  area: MatchArea | null;
 };
 
 export type MatchSettings = {
@@ -32,7 +35,7 @@ export function createMatch(settings: MatchSettings, now = Date.now(), id = `mat
   const captorCount = Math.floor(settings.captorCount);
   if (!Number.isFinite(durationMinutes) || durationMinutes < 1 || durationMinutes > 180) throw new Error("A duração deve ficar entre 1 e 180 minutos.");
   if (!Number.isFinite(captorCount) || captorCount < 1) throw new Error("A partida precisa ter pelo menos um pegador.");
-  return { id, playerId: "local-player", playerName, durationSeconds: durationMinutes * 60, captorCount, status: "waiting", createdAt: now, startedAt: null, finishedAt: null, events: [] };
+  return { id, playerId: "local-player", playerName, durationSeconds: durationMinutes * 60, captorCount, status: "waiting", createdAt: now, startedAt: null, finishedAt: null, events: [], area: null };
 }
 
 export function startMatch(match: MatchSession, now = Date.now()): MatchSession {
