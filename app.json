@@ -2,13 +2,16 @@
   "expo": {
     "name": "TagRun",
     "slug": "tagrun",
-    "version": "0.1.0",
+    "version": "0.2.0",
     "orientation": "portrait",
     "userInterfaceStyle": "dark",
     "newArchEnabled": true,
     "android": {
       "package": "com.tagrun.app",
-      "permissions": ["ACCESS_COARSE_LOCATION", "ACCESS_FINE_LOCATION"]
+      "permissions": [
+        "ACCESS_COARSE_LOCATION",
+        "ACCESS_FINE_LOCATION"
+      ]
     },
     "ios": {
       "supportsTablet": true,
@@ -17,9 +20,12 @@
       }
     },
     "plugins": [
-      ["expo-location", {
-        "locationWhenInUsePermission": "Permitir que o TagRun mostre sua posição no mapa durante a partida."
-      }]
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "Permitir que o TagRun mostre sua posição no mapa durante a partida."
+        }
+      ]
     ]
   }
 }
