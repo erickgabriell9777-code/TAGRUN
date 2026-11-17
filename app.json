@@ -1,0 +1,25 @@
+{
+  "expo": {
+    "name": "TagRun",
+    "slug": "tagrun",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "dark",
+    "newArchEnabled": true,
+    "android": {
+      "package": "com.tagrun.app",
+      "permissions": ["ACCESS_COARSE_LOCATION", "ACCESS_FINE_LOCATION"]
+    },
+    "ios": {
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "O TagRun usa sua localização para mostrar sua posição durante a partida."
+      }
+    },
+    "plugins": [
+      ["expo-location", {
+        "locationWhenInUsePermission": "Permitir que o TagRun mostre sua posição no mapa durante a partida."
+      }]
+    ]
+  }
+}
