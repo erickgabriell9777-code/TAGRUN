@@ -101,3 +101,13 @@ A seleção deve considerar maturidade, suporte Android/iOS, permissões, manute
 - Tecnologia de comunicação local suportada e alcance realista.
 - Backend e autenticação.
 - Política de privacidade, retenção e exclusão de dados.
+
+
+## 11. Relógio compartilhado e radar
+
+O motor de radar calcula ciclos a partir do mesmo horário de início e da mesma configuração distribuídos aos aparelhos. Como os relógios dos celulares podem divergir, foi criado um utilitário de estimativa de diferença entre o relógio local e o horário informado por uma autoridade da partida.
+
+- A estimativa usa o ponto médio entre envio e recebimento e prefere a amostra com menor tempo de ida e volta.
+- A incerteza estimada é metade do tempo de ida e volta; a interface/servidor não deve tratar essa estimativa como precisão absoluta.
+- O utilitário não escolhe nem implementa o servidor autoritativo. Essa autoridade e o transporte de mensagens serão definidos junto com a arquitetura de salas/comunicação.
+- Sem uma referência temporal comum distribuída, cada aparelho pode divergir; portanto, o radar ainda não está sincronizado em multiplayer real.
