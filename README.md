@@ -2,72 +2,60 @@
 
 **O pega-pega da vida real.**
 
-TagRun é um aplicativo para organizar partidas presenciais de pega-pega usando os celulares dos participantes como mapa, GPS e ferramenta de comunicação da partida.
+TagRun é uma experiência de pega-pega presencial com apoio de mapa, GPS e comunicação entre participantes.
 
-## Objetivo inicial
+## Direção atual do projeto
 
-Desenvolver primeiro para **Android**, mantendo a arquitetura preparada para uma versão futura para **iOS**.
+A primeira versão será desenvolvida como **site responsivo**, acessível pelo navegador do celular, tablet e computador. A versão Android/iOS será iniciada depois que a primeira versão web estiver funcional.
 
-## Conceito da primeira modalidade
+## Prévia web
+
+A interface web inicial usa React + TypeScript + Vite e reutiliza as regras puras de partida já existentes.
+
+### O que já funciona nesta prévia
+- Interface responsiva com identidade visual inicial do TagRun.
+- Criar uma partida local com nome, duração e quantidade de pegadores.
+- Iniciar e encerrar a partida.
+- Cronômetro local baseado em timestamps.
+- Registrar uma captura local uma única vez.
+- Salvar e recuperar a partida no armazenamento do navegador.
+
+### Limites desta prévia
+- A partida ainda existe somente no navegador/dispositivo atual.
+- Não há salas multiplayer, convites ou sincronização entre jogadores.
+- O mapa exibido é apenas uma representação visual; GPS e mapa real ainda não estão conectados.
+- O radar ainda não está conectado à partida web.
+- O funcionamento offline entre aparelhos exige uma camada de comunicação local que ainda será desenvolvida e testada.
+
+## Desenvolvimento local
+
+Requer Node.js 22 ou superior.
+
+```bash
+npm install
+npm run web
+```
+
+Para gerar a versão estática:
+
+```bash
+npm run build:web
+```
+
+O resultado será criado na pasta `dist/`, pronta para hospedagem estática, por exemplo no Cloudflare Pages.
+
+## Requisitos centrais do produto
 
 - Uma pessoa organiza a partida e configura as regras.
-- Os participantes entram em uma sala.
-- O sistema recomenda a quantidade de pegadores conforme o número de participantes; o organizador pode ajustar essa quantidade dentro dos limites definidos.
-- Os papéis de pegador e fugitivo são atribuídos para a partida.
-- Os pegadores procuram os fugitivos dentro da área definida.
-- O fugitivo registra que foi pego pelo botão **FUI PEGO** após o toque presencial.
-- A partida acompanha tempo, participantes, capturas e resultado.
-
-## Requisito central: funcionamento offline
-
-O TagRun deve continuar útil sem internet: mapa previamente baixado, GPS local, cronômetro, regras e registro local de eventos.
-
-**Limite técnico importante:** GPS permite que cada aparelho descubra sua própria posição, mas não transmite essa posição aos demais. Para compartilhar posições e eventos sem internet, será necessário implementar e testar comunicação local entre aparelhos. Nenhuma solução deve prometer comunicação offline ilimitada entre celulares.
-
-## Princípios do projeto
-
-- Priorizar segurança física e privacidade dos participantes.
-- Indicar claramente quando uma posição estiver desatualizada ou indisponível.
-- Não tratar GPS como prova de toque físico.
-- Evitar perda de dados quando a conexão cair e sincronizar eventos quando possível.
-- Manter as regras da partida separadas da infraestrutura compartilhada, permitindo novos modos no futuro.
+- Participantes entram em uma sala compartilhada.
+- O sistema recomenda a quantidade de pegadores; o organizador pode ajustar.
+- Papéis de pegador e fugitivo são distribuídos para a partida.
+- Fugitivos registram o toque presencial pelo botão **FUI PEGO**.
+- O jogo acompanha tempo, participantes, capturas e resultado.
+- O produto deve continuar útil sem internet, com mapa previamente baixado, GPS local e registro de eventos.
+- GPS não transmite a localização para outros celulares. Comunicação offline entre aparelhos precisa ser implementada e testada; não será prometido alcance ilimitado.
 
 ## Documentação
 
 - [Especificação do produto](docs/PRODUCT_SPEC.md)
 - [Arquitetura e decisões técnicas](docs/TECHNICAL_ARCHITECTURE.md)
-
-## Aplicativo — protótipo 0.1.0
-
-A primeira base do aplicativo foi iniciada com Expo + React Native + TypeScript.
-
-### O que já existe no protótipo
-- Tela inicial com identificação do jogador.
-- Fluxo local de configuração e sala de espera.
-- Configuração validada de duração (1–180 minutos) e quantidade de pegadores.
-- Tela de partida com cronômetro calculado por timestamps.
-- Solicitação de permissão e leitura da localização GPS do próprio aparelho.
-- Persistência local da partida e dos eventos usando AsyncStorage.
-- Recuperação da partida após fechar e reabrir o aplicativo.
-- Registro de captura local idempotente (o mesmo jogador não é contado duas vezes).
-- Testes automatizados das regras de domínio e workflow de CI para typecheck/testes.
-
-### O que ainda NÃO está implementado
-- Salas reais entre vários celulares.
-- Comunicação entre aparelhos sem internet.
-- Mapa real, mapas offline e marcadores de outros jogadores.
-- Sorteio e distribuição real de papéis.
-- Sincronização de capturas, radar e resultados entre participantes.
-- Testes em aparelhos físicos e validação de compilação.
-
-### Como iniciar o protótipo
-Com Node.js instalado:
-```bash
-npm install
-npx expo start
-```
-Depois, abra o projeto no Expo Go para testar a interface e o fluxo local.
-
-## Status
-
-A base inicial do aplicativo está no repositório como **protótipo offline local**, não uma versão multiplayer pronta. A persistência foi implementada no código, mas ainda precisa ser validada em aparelho físico. As decisões ainda marcadas como **a definir** não devem ser tratadas como requisitos fechados.
